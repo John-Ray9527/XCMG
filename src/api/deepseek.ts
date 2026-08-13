@@ -1,7 +1,9 @@
-// DeepSeek 大模型客户端（浏览器直调，OpenAI 兼容接口）
+// DeepSeek 大模型客户端
+// 优先走 serverless 反代（密钥存服务端，浏览器不含 key）；未配置反代时回退浏览器直调（仅本地开发用）
 
+const API_BASE = import.meta.env.VITE_API_BASE as string | undefined
 const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY as string | undefined
-const ENDPOINT = 'https://api.deepseek.com/chat/completions'
+const DIRECT_ENDPOINT = 'https://api.deepseek.com/chat/completions'
 const MODEL = 'deepseek-chat'
 
 // 系统角色 Prompt（按 PRD 第六节）
@@ -11,24 +13,37 @@ export const SYSTEM_PROMPT = `你是一名具有20年经验的矿用液压挖掘
 回答要求：专业、工程化、给出依据、标注来源页码。`
 
 async function chat(userContent: string, system: string = SYSTEM_PROMPT): Promise<string> {
-  if (!API_KEY) {
-    throw new Error('未配置 DeepSeek API Key，请在 .env 中填写 VITE_DEEPSEEK_API_KEY')
+  const messages = [
+    { role: 'system', content: system },
+    { role: 'user', content: userContent },
+  ]
+
+  // 1) 反代模式：密钥在服务端，浏览器不持有任何 key
+  if (API_BASE) {
+    const res = await fetch(`${API_BASE.replace(/\/$/, '')}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: MODEL, messages, temperature: 0.7, max_tokens: 1200 }),
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`反代请求失败（${res.status}）：${text.slice(0, 200)}`)
+    }
+    const data = await res.json()
+    return data?.content ?? data?.choices?.[0]?.message?.content ?? ''
   }
-  const res = await fetch(ENDPOINT, {
+
+  // 2) 直连模式（仅本地开发 / 未配置反代时）
+  if (!API_KEY) {
+    throw new Error('未配置反代地址或 API Key，请在 .env 中填写 VITE_API_BASE（推荐）或 VITE_DEEPSEEK_API_KEY')
+  }
+  const res = await fetch(DIRECT_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${API_KEY}`,
     },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: userContent },
-      ],
-      temperature: 0.7,
-      max_tokens: 1200,
-    }),
+    body: JSON.stringify({ model: MODEL, messages, temperature: 0.7, max_tokens: 1200 }),
   })
   if (!res.ok) {
     const text = await res.text().catch(() => '')

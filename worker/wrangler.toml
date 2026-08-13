@@ -1,0 +1,9 @@
+name = "deepseek-proxy"
+main = "index.js"
+compatibility_date = "2025-01-01"
+
+# 部署步骤：
+#   1. npx wrangler login
+#   2. npx wrangler secret put DEEPSEEK_API_KEY   # 粘贴新 key（不会进前端）
+#   3. npx wrangler deploy
+# 部署后得到 https://deepseek-proxy.<你的子域>.workers.dev，填入前端 .env 的 VITE_API_BASE
