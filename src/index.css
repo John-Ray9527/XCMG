@@ -1,0 +1,178 @@
+:root {
+  --bg: #0a0e16;
+  --panel: #101827;
+  --panel-2: #151f31;
+  --border: #1f2a40;
+  --border-strong: #2c3a55;
+  --blue: #2f81f7;
+  --blue-bright: #4c9bff;
+  --cyan: #22d3ee;
+  --yellow: #f5b301;
+  --text: #e7eef7;
+  --text-dim: #8b98ab;
+  --text-faint: #5b6a80;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(47, 129, 247, 0.08), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(34, 211, 238, 0.06), transparent 45%),
+    linear-gradient(rgba(31, 42, 64, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 42, 64, 0.25) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* 通用卡片：工业科技风 */
+.tech-card {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  opacity: 0.7;
+}
+
+.tech-card--accent::before {
+  background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+
+.card-title .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--blue);
+  box-shadow: 0 0 8px var(--blue);
+}
+
+.card-title--yellow .dot {
+  background: var(--yellow);
+  box-shadow: 0 0 8px var(--yellow);
+}
+
+/* 数据高亮 */
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--blue-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* 关键词 tag */
+.keyword-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  margin: 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.06);
+  font-size: 13px;
+}
+
+/* 流程节点 */
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  min-width: 96px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+}
+
+.flow-node .flow-icon {
+  font-size: 22px;
+}
+
+.flow-node .flow-name {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.flow-arrow {
+  color: var(--blue);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #24324d;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #31415f;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 顶部栏副标题 */
+.page-subtitle {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 4px 0 16px;
+}
+
+/* AI 结果区域动画 */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-up {
+  animation: fadeUp 0.35s ease;
+}
