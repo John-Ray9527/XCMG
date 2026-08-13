@@ -24,9 +24,9 @@ export default function Dashboard() {
   return (
     <div className="fade-up">
       <div style={{ textAlign: 'center', padding: '28px 0 8px' }}>
-        <h1 style={{ margin: 0, fontSize: 30, fontWeight: 700, letterSpacing: 2 }}>矿智研</h1>
+        <h1 style={{ margin: 0, fontSize: 30, fontWeight: 700, letterSpacing: 2 }}>矿擎智鉴</h1>
         <p style={{ color: '#8b98ab', fontSize: 15, margin: '8px 0 0' }}>
-          AI 驱动的 300 吨级液压挖掘机竞品技术分析助手
+          AI赋能的矿挖竞品技术洞察与产品决策平台
         </p>
       </div>
 

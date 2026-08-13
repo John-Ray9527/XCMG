@@ -89,7 +89,7 @@ function exportPpt() {
   cover.addText(reportTitle, {
     x: 0.5, y: 2.6, w: 12.3, fontSize: 32, bold: true, color: '2F81F7', align: 'center',
   })
-  cover.addText('矿智研 · AI 竞品技术分析助手', {
+  cover.addText('矿擎智鉴 · AI赋能的矿挖竞品技术洞察与产品决策平台', {
     x: 0.5, y: 3.7, w: 12.3, fontSize: 18, color: '8B98AB', align: 'center',
   })
 

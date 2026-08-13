@@ -69,8 +69,8 @@ export default function App() {
             矿
           </div>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>矿智研</div>
-            <div style={{ fontSize: 11, color: '#8b98ab' }}>竞品技术分析助手</div>
+            <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>矿擎智鉴</div>
+            <div style={{ fontSize: 11, color: '#8b98ab' }}>矿挖竞品技术洞察平台</div>
           </div>
         </div>
         <Menu
@@ -95,7 +95,7 @@ export default function App() {
           }}
         >
           <span style={{ fontSize: 15, color: '#e7eef7' }}>
-            AI 驱动的 <span style={{ color: '#f5b301' }}>300 吨级</span>液压挖掘机竞品技术分析平台
+            <span style={{ color: '#f5b301' }}>AI赋能</span>的矿挖竞品技术洞察与产品决策平台
           </span>
         </Header>
         <Content style={{ padding: 24, overflow: 'auto' }}>
