@@ -17,8 +17,8 @@ const radarOption = {
       { name: '可靠性', max: 100 },
       { name: '维护性', max: 100 },
     ],
-    axisName: { color: '#8b98ab' },
-    splitLine: { lineStyle: { color: '#1f2a40' } },
+    axisName: { color: '#7a8ba3' },
+    splitLine: { lineStyle: { color: '#1e2836' } },
     splitArea: { areaStyle: { color: ['#0d1422', '#111a2b'] } },
   },
   series: [
@@ -28,9 +28,9 @@ const radarOption = {
         {
           value: [90, 88, 82, 92, 85],
           name: 'EX2600-7E',
-          areaStyle: { color: 'rgba(47,129,247,0.35)' },
-          lineStyle: { color: '#2f81f7', width: 2 },
-          itemStyle: { color: '#22d3ee' },
+          areaStyle: { color: 'rgba(53,224,200,0.35)' },
+          lineStyle: { color: '#35e0c8', width: 2 },
+          itemStyle: { color: '#35e0c8' },
         },
       ],
     },
@@ -40,7 +40,7 @@ const radarOption = {
 const infoRows = (data: Record<string, string>) =>
   Object.entries(data).map(([k, v]) => (
     <div key={k} style={{ display: 'flex', gap: 8, padding: '6px 0' }}>
-      <span style={{ color: '#8b98ab', width: 72, flexShrink: 0 }}>{k}</span>
+      <span style={{ color: '#7a8ba3', width: 72, flexShrink: 0 }}>{k}</span>
       <span style={{ color: '#c9d4e3' }}>{v}</span>
     </div>
   ))

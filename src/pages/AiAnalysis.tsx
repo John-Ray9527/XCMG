@@ -65,7 +65,7 @@ export default function AiAnalysis() {
               </span>
             ))}
             {generated && (
-              <div style={{ marginTop: 12, fontSize: 12, color: '#8b98ab' }}>
+              <div style={{ marginTop: 12, fontSize: 12, color: '#7a8ba3' }}>
                 由 DeepSeek 大模型实时生成
               </div>
             )}

@@ -87,19 +87,19 @@ function exportPpt() {
   const cover = pptx.addSlide()
   cover.background = { color: '0A0E16' }
   cover.addText(reportTitle, {
-    x: 0.5, y: 2.6, w: 12.3, fontSize: 32, bold: true, color: '2F81F7', align: 'center',
+    x: 0.5, y: 2.6, w: 12.3, fontSize: 32, bold: true, color: '35E0C8', align: 'center',
   })
   cover.addText('矿擎智鉴 · AI赋能的矿挖竞品技术洞察与产品决策平台', {
-    x: 0.5, y: 3.7, w: 12.3, fontSize: 18, color: '8B98AB', align: 'center',
+    x: 0.5, y: 3.7, w: 12.3, fontSize: 18, color: '7A8BA3', align: 'center',
   })
 
   chapters.forEach((c) => {
     const s = pptx.addSlide()
     s.background = { color: '0A0E16' }
-    s.addText(c.title, { x: 0.6, y: 0.5, w: 12, fontSize: 26, bold: true, color: '2F81F7' })
+    s.addText(c.title, { x: 0.6, y: 0.5, w: 12, fontSize: 26, bold: true, color: '35E0C8' })
     s.addText(
       c.paras.map((p) => ({ text: p, options: { bullet: true, breakLine: true, paraSpaceAfter: 8 } })),
-      { x: 0.9, y: 1.5, w: 11.5, h: 5.4, fontSize: 16, color: 'E7EEF7' },
+      { x: 0.9, y: 1.5, w: 11.5, h: 5.4, fontSize: 16, color: 'E6EDF5' },
     )
   })
 
@@ -121,7 +121,7 @@ export default function ReportCenter() {
       {!generated ? (
         <div style={{ textAlign: 'center', paddingTop: 80 }}>
           <Result
-            icon={<ThunderboltOutlined style={{ color: '#f5b301' }} />}
+            icon={<ThunderboltOutlined style={{ color: '#f5a623' }} />}
             title="生成《EX2600-7E 竞品技术分析报告》"
             subTitle="基于竞品技术档案，自动汇总六大章节内容"
             extra={
@@ -137,7 +137,7 @@ export default function ReportCenter() {
             <Button type="primary" icon={<FileWordOutlined />} onClick={() => exportWord()}>
               导出 Word
             </Button>
-            <Button icon={<FilePptOutlined />} onClick={() => exportPpt()} style={{ borderColor: '#f5b301', color: '#f5b301' }}>
+            <Button icon={<FilePptOutlined />} onClick={() => exportPpt()} style={{ borderColor: '#f5a623', color: '#f5a623' }}>
               导出 PPT
             </Button>
           </div>

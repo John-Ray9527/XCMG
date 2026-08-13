@@ -25,7 +25,7 @@ export default function Dashboard() {
     <div className="fade-up">
       <div style={{ textAlign: 'center', padding: '28px 0 8px' }}>
         <h1 style={{ margin: 0, fontSize: 30, fontWeight: 700, letterSpacing: 2 }}>矿擎智鉴</h1>
-        <p style={{ color: '#8b98ab', fontSize: 15, margin: '8px 0 0' }}>
+        <p style={{ color: '#7a8ba3', fontSize: 15, margin: '8px 0 0' }}>
           AI赋能的矿挖竞品技术洞察与产品决策平台
         </p>
       </div>
@@ -60,12 +60,12 @@ export default function Dashboard() {
             className="tech-card"
             style={{ cursor: 'pointer', padding: '22px 20px' }}
             onClick={() => navigate(f.path)}
-            onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#2f81f7')}
-            onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1f2a40')}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#35e0c8')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2836')}
           >
             <div style={{ fontSize: 30, marginBottom: 12 }}>{f.icon}</div>
             <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{f.title}</div>
-            <div style={{ fontSize: 13, color: '#8b98ab' }}>{f.desc}</div>
+            <div style={{ fontSize: 13, color: '#7a8ba3' }}>{f.desc}</div>
           </div>
         ))}
       </div>

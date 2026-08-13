@@ -41,7 +41,7 @@ export default function App() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={224} theme="dark" style={{ borderRight: '1px solid #1f2a40' }}>
+      <Sider width={224} theme="dark" style={{ borderRight: '1px solid #1e2836' }}>
         <div
           style={{
             height: 64,
@@ -49,28 +49,29 @@ export default function App() {
             alignItems: 'center',
             gap: 10,
             padding: '0 20px',
-            borderBottom: '1px solid #1f2a40',
+            borderBottom: '1px solid #1e2836',
           }}
         >
           <div
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: 'linear-gradient(135deg, #2f81f7, #22d3ee)',
+              width: 34,
+              height: 34,
+              borderRadius: 6,
+              background: 'linear-gradient(135deg, #35e0c8, #1fa894)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
-              color: '#fff',
+              color: '#04110e',
               fontSize: 16,
+              boxShadow: '0 0 14px rgba(53,224,200,0.4)',
             }}
           >
             矿
           </div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>矿擎智鉴</div>
-            <div style={{ fontSize: 11, color: '#8b98ab' }}>矿挖竞品技术洞察平台</div>
+            <div style={{ fontSize: 11, color: '#7a8ba3' }}>矿挖竞品技术洞察平台</div>
           </div>
         </div>
         <Menu
@@ -90,12 +91,17 @@ export default function App() {
             padding: '0 24px',
             display: 'flex',
             alignItems: 'center',
-            borderBottom: '1px solid #1f2a40',
-            background: '#0c1220',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid #1e2836',
+            background: '#0a0f16',
           }}
         >
-          <span style={{ fontSize: 15, color: '#e7eef7' }}>
-            <span style={{ color: '#f5b301' }}>AI赋能</span>的矿挖竞品技术洞察与产品决策平台
+          <span style={{ fontSize: 15, color: '#e6edf5', letterSpacing: 0.5 }}>
+            <span style={{ color: '#f5a623' }}>AI赋能</span>的矿挖竞品技术洞察与产品决策平台
+          </span>
+          <span className="hud-status">
+            <span className="lamp" />
+            系统在线 · SYSTEM ONLINE
           </span>
         </Header>
         <Content style={{ padding: 24, overflow: 'auto' }}>

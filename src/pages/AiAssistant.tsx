@@ -88,23 +88,23 @@ export default function AiAssistant() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: m.role === 'user' ? '#2f81f7' : '#1a2a3f',
-                  color: m.role === 'user' ? '#fff' : '#4c9bff',
+                  background: m.role === 'user' ? '#35e0c8' : '#12262a',
+                  color: m.role === 'user' ? '#fff' : '#35e0c8',
                 }}
               >
                 {m.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
               </div>
               <div
                 style={{
-                  background: m.role === 'user' ? '#152238' : '#101827',
-                  border: '1px solid #1f2a40',
+                  background: m.role === 'user' ? '#12262a' : '#101827',
+                  border: '1px solid #1e2836',
                   borderRadius: 10,
                   padding: '12px 16px',
                 }}
               >
-                <div style={{ whiteSpace: 'pre-wrap', color: '#e7eef7', lineHeight: 1.9 }}>{m.content}</div>
+                <div style={{ whiteSpace: 'pre-wrap', color: '#e6edf5', lineHeight: 1.9 }}>{m.content}</div>
                 {m.source && (
-                  <div style={{ marginTop: 8, fontSize: 12, color: '#22d3ee' }}>来源：{m.source}</div>
+                  <div style={{ marginTop: 8, fontSize: 12, color: '#35e0c8' }}>来源：{m.source}</div>
                 )}
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function AiAssistant() {
         ))}
         {loading && (
           <div style={{ marginBottom: 16 }}>
-            <Spin size="small" /> <span style={{ color: '#8b98ab', marginLeft: 8 }}>AI 正在分析…</span>
+            <Spin size="small" /> <span style={{ color: '#7a8ba3', marginLeft: 8 }}>AI 正在分析…</span>
           </div>
         )}
       </div>

@@ -1,16 +1,15 @@
 :root {
-  --bg: #0a0e16;
-  --panel: #101827;
-  --panel-2: #151f31;
-  --border: #1f2a40;
-  --border-strong: #2c3a55;
-  --blue: #2f81f7;
-  --blue-bright: #4c9bff;
-  --cyan: #22d3ee;
-  --yellow: #f5b301;
-  --text: #e7eef7;
-  --text-dim: #8b98ab;
-  --text-faint: #5b6a80;
+  --bg: #07090d;
+  --panel: #0e131c;
+  --panel-2: #141b27;
+  --border: #1e2836;
+  --border-strong: #2a3648;
+  --cyan: #35e0c8;
+  --cyan-dim: #1fa894;
+  --yellow: #f5a623;
+  --text: #e6edf5;
+  --text-dim: #7a8ba3;
+  --text-faint: #4e5e72;
 }
 
 * {
@@ -29,37 +28,71 @@ body {
   color: var(--text);
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 蓝图网格 + 顶部环境光 */
   background-image:
-    radial-gradient(circle at 15% 0%, rgba(47, 129, 247, 0.08), transparent 40%),
-    radial-gradient(circle at 90% 10%, rgba(34, 211, 238, 0.06), transparent 45%),
-    linear-gradient(rgba(31, 42, 64, 0.25) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(31, 42, 64, 0.25) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    radial-gradient(circle at 12% -5%, rgba(53, 224, 200, 0.09), transparent 45%),
+    radial-gradient(circle at 95% 8%, rgba(245, 166, 35, 0.06), transparent 40%),
+    linear-gradient(rgba(30, 40, 54, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 40, 54, 0.28) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
 }
 
-/* 通用卡片：工业科技风 */
+/* 等宽遥测字体 */
+.mono {
+  font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', 'SF Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* 通用卡片：工业 HUD 角框 + 扫描线 */
 .tech-card {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 18px 20px;
   position: relative;
   overflow: hidden;
 }
 
+/* HUD 角框（左上 / 右下） */
 .tech-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 2px;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, var(--blue), transparent);
-  opacity: 0.7;
+  top: 8px;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  border-top: 2px solid var(--cyan);
+  border-left: 2px solid var(--cyan);
+  pointer-events: none;
 }
 
-.tech-card--accent::before {
-  background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+.tech-card::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  border-bottom: 2px solid var(--cyan);
+  border-right: 2px solid var(--cyan);
+  pointer-events: none;
+}
+
+/* 扫描线纹理（覆盖在卡片内） */
+.tech-card {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 3px,
+      rgba(53, 224, 200, 0.018) 3px 4px
+    ),
+    linear-gradient(180deg, var(--panel-2), var(--panel));
+}
+
+.tech-card--accent::before,
+.tech-card--accent::after {
+  border-color: var(--yellow);
 }
 
 .card-title {
@@ -70,14 +103,15 @@ body {
   font-weight: 600;
   color: var(--text);
   margin: 0 0 14px;
+  letter-spacing: 0.5px;
 }
 
 .card-title .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--blue);
-  box-shadow: 0 0 8px var(--blue);
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
 }
 
 .card-title--yellow .dot {
@@ -85,12 +119,15 @@ body {
   box-shadow: 0 0 8px var(--yellow);
 }
 
-/* 数据高亮 */
+/* 遥测数据高亮 */
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--blue-bright);
+  color: var(--cyan);
+  font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 18px rgba(53, 224, 200, 0.35);
 }
 
 .stat-label {
@@ -103,11 +140,12 @@ body {
   display: inline-block;
   padding: 4px 12px;
   margin: 4px;
-  border: 1px solid var(--border-strong);
-  border-radius: 16px;
+  border: 1px solid rgba(53, 224, 200, 0.4);
+  border-radius: 2px;
   color: var(--cyan);
-  background: rgba(34, 211, 238, 0.06);
+  background: rgba(53, 224, 200, 0.06);
   font-size: 13px;
+  font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;
 }
 
 /* 流程节点 */
@@ -120,7 +158,8 @@ body {
   min-width: 96px;
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
   border: 1px solid var(--border-strong);
-  border-radius: 8px;
+  border-radius: 4px;
+  position: relative;
 }
 
 .flow-node .flow-icon {
@@ -133,10 +172,41 @@ body {
 }
 
 .flow-arrow {
-  color: var(--blue);
+  color: var(--cyan);
   font-size: 20px;
   display: flex;
   align-items: center;
+  text-shadow: 0 0 8px rgba(53, 224, 200, 0.5);
+}
+
+/* 状态灯（顶部 HUD） */
+.hud-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.hud-status .lamp {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 /* 滚动条 */
@@ -155,14 +225,13 @@ body {
   background: transparent;
 }
 
-/* 顶部栏副标题 */
 .page-subtitle {
   color: var(--text-dim);
   font-size: 13px;
   margin: 4px 0 16px;
+  letter-spacing: 0.5px;
 }
 
-/* AI 结果区域动画 */
 @keyframes fadeUp {
   from {
     opacity: 0;

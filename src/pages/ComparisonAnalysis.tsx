@@ -8,32 +8,32 @@ import { compareProducts } from '../api/deepseek'
 
 const barOption = {
   tooltip: { trigger: 'axis' },
-  legend: { data: ['日立 EX2600-7E', '徐工 300 吨级'], textStyle: { color: '#8b98ab' } },
+  legend: { data: ['日立 EX2600-7E', '徐工 300 吨级'], textStyle: { color: '#7a8ba3' } },
   grid: { left: 44, right: 20, top: 44, bottom: 30 },
   xAxis: {
     type: 'category',
     data: compareDims.map((d) => d.label),
-    axisLabel: { color: '#8b98ab', interval: 0 },
-    axisLine: { lineStyle: { color: '#1f2a40' } },
+    axisLabel: { color: '#7a8ba3', interval: 0 },
+    axisLine: { lineStyle: { color: '#1e2836' } },
   },
   yAxis: {
     type: 'value',
-    axisLabel: { color: '#8b98ab' },
-    splitLine: { lineStyle: { color: '#1f2a40' } },
+    axisLabel: { color: '#7a8ba3' },
+    splitLine: { lineStyle: { color: '#1e2836' } },
   },
   series: [
     {
       name: '日立 EX2600-7E',
       type: 'bar',
       data: compareDims.map((d) => d.hitachi),
-      itemStyle: { color: '#2f81f7' },
+      itemStyle: { color: '#35e0c8' },
       barMaxWidth: 28,
     },
     {
       name: '徐工 300 吨级',
       type: 'bar',
       data: compareDims.map((d) => d.xcmg),
-      itemStyle: { color: '#f5b301' },
+      itemStyle: { color: '#f5a623' },
       barMaxWidth: 28,
     },
   ],

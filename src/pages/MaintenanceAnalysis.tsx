@@ -15,7 +15,7 @@ export default function MaintenanceAnalysis() {
     { title: '系统', dataIndex: 'system', key: 'system', width: 120 },
     { title: '维护项目', dataIndex: 'item', key: 'item' },
     { title: '周期', dataIndex: 'interval', key: 'interval', width: 120, render: (v: string) => <Tag color="processing">{v}</Tag> },
-    { title: '来源', dataIndex: 'source', key: 'source', width: 160, render: (v: string) => <span style={{ color: '#22d3ee' }}>{v}</span> },
+    { title: '来源', dataIndex: 'source', key: 'source', width: 160, render: (v: string) => <span style={{ color: '#35e0c8' }}>{v}</span> },
   ]
 
   const search = async () => {
@@ -69,8 +69,8 @@ export default function MaintenanceAnalysis() {
           {loading && <Spin />}
           {answer && (
             <div className="fade-up" style={{ background: '#0d1422', borderRadius: 8, padding: 16 }}>
-              <div style={{ whiteSpace: 'pre-wrap', color: '#e7eef7', lineHeight: 1.9 }}>{answer}</div>
-              <div style={{ marginTop: 12, fontSize: 12, color: '#22d3ee' }}>来源：{source}</div>
+              <div style={{ whiteSpace: 'pre-wrap', color: '#e6edf5', lineHeight: 1.9 }}>{answer}</div>
+              <div style={{ marginTop: 12, fontSize: 12, color: '#35e0c8' }}>来源：{source}</div>
             </div>
           )}
         </SectionCard>

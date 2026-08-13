@@ -31,7 +31,7 @@ export default function OverallAnalysis() {
                   alignItems: 'center',
                   gap: 12,
                   padding: '12px 14px',
-                  border: '1px solid #1f2a40',
+                  border: '1px solid #1e2836',
                   borderRadius: 8,
                   background: '#151f31',
                 }}
@@ -39,7 +39,7 @@ export default function OverallAnalysis() {
                 <span style={{ fontSize: 24 }}>{p.icon}</span>
                 <div>
                   <div style={{ fontWeight: 600 }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: '#8b98ab' }}>{p.desc}</div>
+                  <div style={{ fontSize: 12, color: '#7a8ba3' }}>{p.desc}</div>
                 </div>
               </div>
             ))}
@@ -66,7 +66,7 @@ export default function OverallAnalysis() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {designFeatures.map((g) => (
                 <div key={g.title}>
-                  <div style={{ fontWeight: 600, color: '#f5b301', marginBottom: 8 }}>{g.title}</div>
+                  <div style={{ fontWeight: 600, color: '#f5a623', marginBottom: 8 }}>{g.title}</div>
                   <ul style={{ margin: 0, paddingLeft: 18, color: '#c9d4e3', lineHeight: 2 }}>
                     {g.items.map((it) => (
                       <li key={it}>{it}</li>
