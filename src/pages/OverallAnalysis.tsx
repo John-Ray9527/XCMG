@@ -1,83 +1,73 @@
+import { useState } from 'react'
+import { Button, Spin, message } from 'antd'
+import { ThunderboltOutlined } from '@ant-design/icons'
 import SectionCard from '../components/SectionCard'
-import FlowDiagram from '../components/FlowDiagram'
-import { hitachiProfile } from '../data/mock'
+import RequireKnowledge from '../components/RequireKnowledge'
+import { useAnalysis } from '../store/AnalysisContext'
+import { generateOverall } from '../api/deepseek'
 
-const designFeatures = [
-  { title: '优势', items: ['正铲结构作业效率高', '模块化设计便于维修', '双回路液压独立供油'] },
-  { title: '特点', items: ['电驱动/柴油双动力可选', '远程智能监控', '大斗容匹配短循环'] },
-]
-
-const structureParts = [
-  { name: '动臂 / 斗杆', icon: '🏗', desc: '工作装置' },
-  { name: '回转平台', icon: '🔄', desc: '上部结构' },
-  { name: '发动机', icon: '🔥', desc: '动力系统' },
-  { name: '液压系统', icon: '⚙', desc: '驱动系统' },
-]
+function renderLines(text: string) {
+  return text
+    .split('\n')
+    .map((s) => s.replace(/^[-•*]\s*/, '').trim())
+    .filter(Boolean)
+    .map((s, i) => <li key={i}>{s}</li>)
+}
 
 export default function OverallAnalysis() {
+  const { profile, entries } = useAnalysis()
+  const [result, setResult] = useState<{ layout: string; design: string; implications: string } | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const run = async () => {
+    setLoading(true)
+    try {
+      setResult(await generateOverall(profile, entries))
+    } catch (e) {
+      message.error((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="fade-up">
-      <div className="page-subtitle">解析日立 EX2600-7E 总体方案，突出产品总体工程师价值</div>
+    <RequireKnowledge>
+      <div className="fade-up">
+        <div className="page-subtitle">总体方案分析 · 基于上传资料动态生成总体布置与产品开发启示</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16 }}>
-        {/* 左：设备结构示意 */}
-        <SectionCard title="设备结构示意">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {structureParts.map((p) => (
-              <div
-                key={p.name}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 14px',
-                  border: '1px solid #1e2836',
-                  borderRadius: 8,
-                  background: '#151f31',
-                }}
-              >
-                <span style={{ fontSize: 24 }}>{p.icon}</span>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: '#7a8ba3' }}>{p.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16 }}>
+          <span style={{ color: '#7a8ba3', fontSize: 13 }}>
+            分析对象：{profile ? `${profile.brand} ${profile.model}` : '—'}
+          </span>
+          <Button type="primary" icon={<ThunderboltOutlined />} onClick={run} loading={loading}>
+            生成分析
+          </Button>
+        </div>
 
-        {/* 右：AI 分析结果 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <SectionCard title="模块1 · 总体布置">
-            <ul style={{ margin: 0, paddingLeft: 18, color: '#c9d4e3', lineHeight: 2 }}>
-              {hitachiProfile.overallLayout.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
-          </SectionCard>
-
-          <SectionCard title="模块2 · 系统架构">
-            <FlowDiagram
-              nodes={hitachiProfile.systemFlow.map((n) => ({ name: n }))}
-            />
-          </SectionCard>
-
-          <SectionCard title="模块3 · 设计特点总结" accent>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              {designFeatures.map((g) => (
-                <div key={g.title}>
-                  <div style={{ fontWeight: 600, color: '#f5a623', marginBottom: 8 }}>{g.title}</div>
-                  <ul style={{ margin: 0, paddingLeft: 18, color: '#c9d4e3', lineHeight: 2 }}>
-                    {g.items.map((it) => (
-                      <li key={it}>{it}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+        {!result ? (
+          <SectionCard title="总体方案分析">
+            <div style={{ color: '#5b6a80', fontSize: 13 }}>
+              点击「生成分析」，由大模型基于上传资料输出总体方案洞察。
             </div>
           </SectionCard>
-        </div>
+        ) : (
+          <Spin spinning={loading}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              {[
+                { title: '总体布置', value: result.layout },
+                { title: '设计特点', value: result.design },
+                { title: '产品开发启示', value: result.implications },
+              ].map((g) => (
+                <SectionCard key={g.title} title={g.title} accent>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: '#c9d4e3', lineHeight: 2 }}>
+                    {renderLines(g.value)}
+                  </ul>
+                </SectionCard>
+              ))}
+            </div>
+          </Spin>
+        )}
       </div>
-    </div>
+    </RequireKnowledge>
   )
 }

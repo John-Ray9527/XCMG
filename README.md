@@ -20,7 +20,7 @@
 - 前端：React 19 + TypeScript + Vite
 - UI：Ant Design 6
 - 图表：ECharts
-- AI：DeepSeek 大模型 API（浏览器直调）
+- AI：DeepSeek 大模型 API（经 Vercel Serverless 反代，密钥只存服务端）
 - 导出：docx / pptxgenjs
 
 ## 本地运行
@@ -32,23 +32,25 @@ npm run build      # 生产构建
 npm run preview    # 预览构建产物
 ```
 
-## 配置 AI Key
+## 配置反代地址
 
-复制 `.env.example` 为 `.env`，填入 DeepSeek API Key：
+密钥只存服务端，浏览器不接触 Key。复制 `.env.example` 为 `.env`，填入反代地址：
 
 ```bash
-VITE_DEEPSEEK_API_KEY=sk-你的Key
+VITE_API_BASE=https://api.johnray.top
 ```
 
-> `.env` 已加入 `.gitignore`，不会被提交。
+> 反代后端见 `proxy-vercel/`（Vercel Serverless，Python FastAPI），DeepSeek 密钥通过服务端环境变量 `DEEPSEEK_API_KEY` 注入；`.env` 已加入 `.gitignore`，不会被提交。
 
 ## 部署
 
-部署到 GitHub Pages（仓库 `XCMG`）：
+- 前端：GitHub Pages（仓库 `XCMG`）
 
-```bash
-npm run deploy
-```
+  ```bash
+  npm run deploy
+  ```
+
+- 后端反代：Vercel（目录 `proxy-vercel/`，Python FastAPI）。在 Vercel 配置环境变量 `DEEPSEEK_API_KEY`，并将自定义域名指向 `api.johnray.top`。
 
 ## 页面结构
 

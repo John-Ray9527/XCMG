@@ -25,13 +25,13 @@ const { Sider, Header, Content } = Layout
 
 const menuItems = [
   { key: '/', icon: <DashboardOutlined />, label: '首页' },
-  { key: '/resources', icon: <DatabaseOutlined />, label: '竞品资料库' },
-  { key: '/ai-analysis', icon: <ExperimentOutlined />, label: 'AI智能分析' },
+  { key: '/resources', icon: <DatabaseOutlined />, label: '竞品数字档案' },
+  { key: '/ai-analysis', icon: <ExperimentOutlined />, label: '竞品数字画像' },
   { key: '/overall', icon: <ApartmentOutlined />, label: '总体方案分析' },
-  { key: '/hydraulic', icon: <SettingOutlined />, label: '液压系统分析' },
-  { key: '/maintenance', icon: <ToolOutlined />, label: '保养维护分析' },
-  { key: '/comparison', icon: <BarChartOutlined />, label: '竞品对比分析' },
-  { key: '/assistant', icon: <RobotOutlined />, label: 'AI工程助手' },
+  { key: '/hydraulic', icon: <SettingOutlined />, label: '液压系统技术洞察' },
+  { key: '/maintenance', icon: <ToolOutlined />, label: '可靠性与维护策略' },
+  { key: '/comparison', icon: <BarChartOutlined />, label: '竞品对标与开发建议' },
+  { key: '/assistant', icon: <RobotOutlined />, label: 'AI工程检索助手' },
   { key: '/report', icon: <FileTextOutlined />, label: '报告生成中心' },
 ]
 
@@ -71,7 +71,7 @@ export default function App() {
           </div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>矿擎智鉴</div>
-            <div style={{ fontSize: 11, color: '#7a8ba3' }}>矿挖竞品技术洞察平台</div>
+            <div style={{ fontSize: 11, color: '#7a8ba3' }}>超大型矿山装备竞品洞察</div>
           </div>
         </div>
         <Menu
@@ -97,7 +97,7 @@ export default function App() {
           }}
         >
           <span style={{ fontSize: 15, color: '#e6edf5', letterSpacing: 0.5 }}>
-            <span style={{ color: '#f5a623' }}>AI赋能</span>的矿挖竞品技术洞察与产品决策平台
+            <span style={{ color: '#f5a623' }}>AI驱动</span>的超大型矿山装备竞品技术洞察与产品决策平台
           </span>
           <span className="hud-status">
             <span className="lamp" />

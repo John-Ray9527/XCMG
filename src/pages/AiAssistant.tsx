@@ -1,25 +1,100 @@
 import { useEffect, useRef, useState } from 'react'
-import { Input, Button, Spin, Empty } from 'antd'
+import { Input, Button, Spin, Empty, Tag } from 'antd'
 import { RobotOutlined, SendOutlined, UserOutlined } from '@ant-design/icons'
 import { useLocation } from 'react-router-dom'
-import { askAssistant } from '../api/deepseek'
+import { askRag } from '../api/deepseek'
+import type { RagAnswer } from '../api/deepseek'
+import RequireKnowledge from '../components/RequireKnowledge'
+import { useAnalysis } from '../store/AnalysisContext'
 
 interface ChatMsg {
   role: 'user' | 'assistant'
-  content: string
-  source?: string
+  content?: string
+  answer?: RagAnswer
 }
 
-function inferSource(q: string): string {
-  if (/液压/.test(q)) return '维修手册 P28-29'
-  if (/发动机|机油/.test(q)) return '保养手册 P12'
-  if (/保养|维护/.test(q)) return '保养手册 P28'
-  return '操作手册 P8'
+// 将 DeepSeek 返回的 markdown 轻量排版（去 ** / 列表符 → 逐行渲染）
+function renderLines(text: string) {
+  return text
+    .replace(/\*\*/g, '')
+    .split('\n')
+    .map((s) => s.replace(/^[-•*]\s*/, '').trim())
+    .filter(Boolean)
+    .map((s, i) => (
+      <div key={i} style={{ lineHeight: 1.8 }}>{s}</div>
+    ))
+}
+
+function Section({ label, color, text }: { label: string; color: string; text: string }) {
+  if (!text) return null
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 12, color, marginBottom: 5, fontWeight: 600, letterSpacing: 1 }}>{label}</div>
+      <div style={{ fontSize: 14, color: '#c9d4e3' }}>{renderLines(text)}</div>
+    </div>
+  )
+}
+
+function RagAnswerView({ answer }: { answer: RagAnswer }) {
+  const noMatch = answer.source === '知识库未命中'
+  const hasPage = answer.page && answer.page !== '—'
+
+  return (
+    <div>
+      {/* 资料来源 */}
+      <div style={{ marginBottom: 10 }}>
+        <span style={{ fontSize: 12, color: '#7a8ba3', marginRight: 6 }}>资料来源：</span>
+        <Tag color={noMatch ? 'warning' : 'cyan'} style={{ marginRight: 6 }}>{answer.source}</Tag>
+        {answer.system && answer.system !== '—' && <Tag style={{ marginRight: 6 }}>{answer.system}</Tag>}
+        {hasPage && <Tag>P{answer.page}</Tag>}
+      </div>
+
+      {/* 原文 / 未命中提示 */}
+      <div
+        style={{
+          background: '#0d1422',
+          border: '1px solid #1e2836',
+          borderLeft: `3px solid ${noMatch ? '#7a8ba3' : '#f5a623'}`,
+          borderRadius: 8,
+          padding: '10px 14px',
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ fontSize: 12, color: noMatch ? '#7a8ba3' : '#f5a623', marginBottom: 6, fontWeight: 600, letterSpacing: 1 }}>
+          {noMatch ? '提示' : '英文原文'}
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            color: '#c9d4e3',
+            lineHeight: 1.7,
+            fontFamily: noMatch ? 'inherit' : 'Consolas, "Courier New", monospace',
+          }}
+        >
+          {answer.original}
+        </div>
+      </div>
+
+      <Section label="专业翻译" color="#35e0c8" text={answer.translation} />
+      <Section label="技术分析" color="#7a8ba3" text={answer.analysis} />
+      <Section label="产品开发启示" color="#f5a623" text={answer.advice} />
+
+      {answer.matched_tags.length > 0 && (
+        <div style={{ marginTop: 4 }}>
+          <span style={{ fontSize: 12, color: '#5b6a80', marginRight: 6 }}>技术标签：</span>
+          {answer.matched_tags.map((t) => (
+            <Tag key={t} style={{ marginBottom: 4, fontSize: 12 }}>{t}</Tag>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function AiAssistant() {
   const location = useLocation()
   const initial = (location.state as { question?: string } | null)?.question
+  const { entries } = useAnalysis()
   const [messages, setMessages] = useState<ChatMsg[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -32,8 +107,9 @@ export default function AiAssistant() {
     setInput('')
     setLoading(true)
     try {
-      const answer = await askAssistant(q)
-      setMessages((prev) => [...prev, { role: 'assistant', content: answer, source: inferSource(q) }])
+      const answer = await askRag(q, entries)
+      setMessages((prev) => [...prev, { role: 'assistant', answer }])
+      localStorage.setItem('kq_last_question', q)
     } catch (e) {
       setMessages((prev) => [...prev, { role: 'assistant', content: `请求失败：${(e as Error).message}` }])
     } finally {
@@ -51,13 +127,14 @@ export default function AiAssistant() {
   }, [messages, loading])
 
   return (
-    <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)' }}>
-      <div className="page-subtitle">基于竞品手册知识库的技术问题智能问答</div>
+    <RequireKnowledge>
+      <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)' }}>
+        <div className="page-subtitle">知识库检索 + 原文追溯 + 专业翻译</div>
 
       <div ref={listRef} style={{ flex: 1, overflowY: 'auto', paddingRight: 8 }}>
         {messages.length === 0 && (
           <Empty
-            description="向 AI 工程助手提问，例如：EX2600-7E 液压系统采用什么控制方式？"
+            description="输入技术问题，例如：液压系统采用什么控制策略？"
             style={{ marginTop: 80 }}
           />
         )}
@@ -73,7 +150,7 @@ export default function AiAssistant() {
           >
             <div
               style={{
-                maxWidth: '78%',
+                maxWidth: '82%',
                 display: 'flex',
                 gap: 10,
                 flexDirection: m.role === 'user' ? 'row-reverse' : 'row',
@@ -102,9 +179,10 @@ export default function AiAssistant() {
                   padding: '12px 16px',
                 }}
               >
-                <div style={{ whiteSpace: 'pre-wrap', color: '#e6edf5', lineHeight: 1.9 }}>{m.content}</div>
-                {m.source && (
-                  <div style={{ marginTop: 8, fontSize: 12, color: '#35e0c8' }}>来源：{m.source}</div>
+                {m.answer ? (
+                  <RagAnswerView answer={m.answer} />
+                ) : (
+                  <div style={{ whiteSpace: 'pre-wrap', color: '#e6edf5', lineHeight: 1.9 }}>{m.content}</div>
                 )}
               </div>
             </div>
@@ -112,7 +190,7 @@ export default function AiAssistant() {
         ))}
         {loading && (
           <div style={{ marginBottom: 16 }}>
-            <Spin size="small" /> <span style={{ color: '#7a8ba3', marginLeft: 8 }}>AI 正在分析…</span>
+            <Spin size="small" /> <span style={{ color: '#7a8ba3', marginLeft: 8 }}>正在检索知识库并生成分析…</span>
           </div>
         )}
       </div>
@@ -120,15 +198,16 @@ export default function AiAssistant() {
       <div style={{ display: 'flex', gap: 12, paddingTop: 12 }}>
         <Input
           size="large"
-          placeholder='输入技术问题，例如："EX2600-7E 液压系统采用什么控制方式？"'
+          placeholder='请输入技术问题，例如："液压系统采用什么控制策略？"'
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onPressEnter={() => send(input)}
         />
         <Button type="primary" size="large" icon={<SendOutlined />} onClick={() => send(input)} loading={loading}>
-          发送
+          开始分析
         </Button>
+        </div>
       </div>
-    </div>
+    </RequireKnowledge>
   )
 }

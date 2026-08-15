@@ -1,5 +1,11 @@
 {
   "rewrites": [
-    { "source": "/chat", "destination": "/api/chat" }
-  ]
+    { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "api/**",
+      "maxDuration": 60
+    }
+  }
 }

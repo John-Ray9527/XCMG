@@ -1,45 +1,13 @@
 import { useState } from 'react'
-import { Button, Table, Spin, Tag, message } from 'antd'
+import { Button, Spin, Tag, message } from 'antd'
 import { ThunderboltOutlined } from '@ant-design/icons'
-import ReactECharts from 'echarts-for-react'
 import SectionCard from '../components/SectionCard'
-import { compareDims, compareText } from '../data/mock'
+import RequireKnowledge from '../components/RequireKnowledge'
+import { useAnalysis } from '../store/AnalysisContext'
 import { compareProducts } from '../api/deepseek'
 
-const barOption = {
-  tooltip: { trigger: 'axis' },
-  legend: { data: ['日立 EX2600-7E', '徐工 300 吨级'], textStyle: { color: '#7a8ba3' } },
-  grid: { left: 44, right: 20, top: 44, bottom: 30 },
-  xAxis: {
-    type: 'category',
-    data: compareDims.map((d) => d.label),
-    axisLabel: { color: '#7a8ba3', interval: 0 },
-    axisLine: { lineStyle: { color: '#1e2836' } },
-  },
-  yAxis: {
-    type: 'value',
-    axisLabel: { color: '#7a8ba3' },
-    splitLine: { lineStyle: { color: '#1e2836' } },
-  },
-  series: [
-    {
-      name: '日立 EX2600-7E',
-      type: 'bar',
-      data: compareDims.map((d) => d.hitachi),
-      itemStyle: { color: '#35e0c8' },
-      barMaxWidth: 28,
-    },
-    {
-      name: '徐工 300 吨级',
-      type: 'bar',
-      data: compareDims.map((d) => d.xcmg),
-      itemStyle: { color: '#f5a623' },
-      barMaxWidth: 28,
-    },
-  ],
-}
-
 export default function ComparisonAnalysis() {
+  const { profile, entries } = useAnalysis()
   const [loading, setLoading] = useState(false)
   const [evalResult, setEvalResult] = useState<{
     advantages: string
@@ -47,16 +15,10 @@ export default function ComparisonAnalysis() {
     suggestions: string
   } | null>(null)
 
-  const sysColumns = [
-    { title: '对比维度', dataIndex: 'label', key: 'label', width: 120 },
-    { title: '日立 EX2600-7E', dataIndex: 'hitachi', key: 'hitachi' },
-    { title: '徐工 300 吨级', dataIndex: 'xcmg', key: 'xcmg' },
-  ]
-
   const run = async () => {
     setLoading(true)
     try {
-      setEvalResult(await compareProducts())
+      setEvalResult(await compareProducts(profile, entries))
     } catch (e) {
       message.error((e as Error).message)
     } finally {
@@ -80,28 +42,14 @@ export default function ComparisonAnalysis() {
   )
 
   return (
-    <div className="fade-up">
-      <div className="page-subtitle">日立 EX2600-7E vs 徐工 300 吨级，生成产品开发参考</div>
+    <RequireKnowledge>
+      <div className="fade-up">
+        <div className="page-subtitle">
+          竞品工程对标 · {profile ? `${profile.brand} ${profile.model}` : '竞品'} vs 我司 300 吨级产品
+        </div>
 
-      <SectionCard title="产品参数对比">
-        <ReactECharts option={barOption} style={{ height: 320 }} />
-      </SectionCard>
-
-      <div style={{ marginTop: 16 }}>
-        <SectionCard title="系统方案对比">
-          <Table
-            rowKey="label"
-            columns={sysColumns}
-            dataSource={compareText.system}
-            pagination={false}
-            size="middle"
-          />
-        </SectionCard>
-      </div>
-
-      <div style={{ marginTop: 16 }}>
         <SectionCard
-          title="AI 评价"
+          title="AI 对标评价"
           accent
           extra={
             <Button type="primary" icon={<ThunderboltOutlined />} onClick={run} loading={loading}>
@@ -111,7 +59,7 @@ export default function ComparisonAnalysis() {
         >
           {!evalResult ? (
             <div style={{ color: '#5b6a80', fontSize: 13 }}>
-              点击「AI 生成评价」，由大模型输出优势、差异与开发建议。
+              点击「AI 生成评价」，由大模型基于上传资料输出竞品优势、差异与我司开发建议。
             </div>
           ) : (
             <Spin spinning={loading}>
@@ -124,6 +72,6 @@ export default function ComparisonAnalysis() {
           )}
         </SectionCard>
       </div>
-    </div>
+    </RequireKnowledge>
   )
 }

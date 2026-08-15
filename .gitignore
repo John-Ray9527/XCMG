@@ -17,6 +17,9 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Cloudflare Wrangler 本地缓存
+.wrangler/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

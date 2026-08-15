@@ -5,156 +5,107 @@ import { Document, Packer, Paragraph, HeadingLevel } from 'docx'
 import { saveAs } from 'file-saver'
 import PptxGenJS from 'pptxgenjs'
 import SectionCard from '../components/SectionCard'
+import RequireKnowledge from '../components/RequireKnowledge'
+import { useAnalysis } from '../store/AnalysisContext'
+import { buildReport } from '../api/deepseek'
+import type { ReportData } from '../api/deepseek'
 
-const reportTitle = 'EX2600-7E 竞品技术分析报告'
+const DEFAULT_TITLE = '竞品技术分析报告'
 
-const chapters = [
-  {
-    title: '一、产品概况',
-    paras: [
-      '产品型号：日立 EX2600-7E',
-      '设备类型：矿用液压挖掘机（正铲）',
-      '吨位等级：300 吨级',
-      '核心技术关键词：液压系统、高可靠性、智能控制、大型矿山、维护便利性',
-    ],
-  },
-  {
-    title: '二、总体方案分析',
-    paras: [
-      '发动机中后置布置，降低整机重心，提升作业稳定性',
-      '液压泵站与主控制阀分区布置，油路走向短、压损小',
-      '维修走道与检修舱门环绕布置，关键部件可达性良好',
-    ],
-  },
-  {
-    title: '三、液压系统分析',
-    paras: [
-      '泵系统：3 组主泵 + 1 组先导泵，斜盘式变量柱塞泵，双回路独立供油',
-      '控制策略：发动机-泵功率匹配、负载敏感 + 正流量控制、怠速自动降速 + 动臂势能回收',
-      '技术评价：功率匹配与节能策略成熟，具备产品开发借鉴价值',
-    ],
-  },
-  {
-    title: '四、保养策略分析',
-    paras: [
-      '发动机机油更换：500h',
-      '液压油滤芯检查：1000h，液压油更换：4000h',
-      '回转齿圈润滑：250h',
-    ],
-  },
-  {
-    title: '五、技术特点总结',
-    paras: [
-      '正铲结构作业效率高，模块化设计便于维修',
-      '双回路液压独立供油，回转与行走优先补偿',
-      '电驱动 / 柴油双动力可选，远程智能监控',
-    ],
-  },
-  {
-    title: '六、产品开发启示',
-    paras: [
-      '对标 EX2600-7E 的势能回收与功率匹配策略，优化本司 300 吨级产品节能表现',
-      '借鉴其模块化维修布局，缩短维护停机时间',
-      '关注电驱动方案，布局新能源矿山装备',
-    ],
-  },
-]
-
-async function exportWord() {
-  const children = chapters.flatMap((c) => [
+async function exportWord(report: ReportData) {
+  const title = report.title || DEFAULT_TITLE
+  const children = report.sections.flatMap((c) => [
     new Paragraph({ text: c.title, heading: HeadingLevel.HEADING_1 }),
     ...c.paras.map((p) => new Paragraph({ text: p })),
   ])
   const doc = new Document({
-    sections: [
-      {
-        children: [
-          new Paragraph({ text: reportTitle, heading: HeadingLevel.TITLE }),
-          ...children,
-        ],
-      },
-    ],
+    sections: [{ children: [new Paragraph({ text: title, heading: HeadingLevel.TITLE }), ...children] }],
   })
   const blob = await Packer.toBlob(doc)
-  saveAs(blob, `${reportTitle}.docx`)
+  saveAs(blob, `${title}.docx`)
 }
 
-function exportPpt() {
+function exportPpt(report: ReportData) {
+  const title = report.title || DEFAULT_TITLE
   const pptx = new PptxGenJS()
   pptx.defineLayout({ name: 'WIDE', width: 13.33, height: 7.5 })
   pptx.layout = 'WIDE'
 
   const cover = pptx.addSlide()
   cover.background = { color: '0A0E16' }
-  cover.addText(reportTitle, {
-    x: 0.5, y: 2.6, w: 12.3, fontSize: 32, bold: true, color: '35E0C8', align: 'center',
-  })
-  cover.addText('矿擎智鉴 · AI赋能的矿挖竞品技术洞察与产品决策平台', {
+  cover.addText(title, { x: 0.5, y: 2.6, w: 12.3, fontSize: 32, bold: true, color: '35E0C8', align: 'center' })
+  cover.addText('矿擎智鉴 · AI驱动的超大型矿山装备竞品技术洞察与产品决策平台', {
     x: 0.5, y: 3.7, w: 12.3, fontSize: 18, color: '7A8BA3', align: 'center',
   })
 
-  chapters.forEach((c) => {
+  report.sections.forEach((c) => {
     const s = pptx.addSlide()
     s.background = { color: '0A0E16' }
     s.addText(c.title, { x: 0.6, y: 0.5, w: 12, fontSize: 26, bold: true, color: '35E0C8' })
     s.addText(
       c.paras.map((p) => ({ text: p, options: { bullet: true, breakLine: true, paraSpaceAfter: 8 } })),
-      { x: 0.9, y: 1.5, w: 11.5, h: 5.4, fontSize: 16, color: 'E6EDF5' },
+      { x: 0.9, y: 1.5, w: 11.5, h: 5.4, fontSize: 15, color: 'E6EDF5' },
     )
   })
 
-  pptx.writeFile({ fileName: `${reportTitle}.pptx` })
+  pptx.writeFile({ fileName: `${title}.pptx` })
 }
 
 export default function ReportCenter() {
-  const [generated, setGenerated] = useState(false)
+  const { profile, entries } = useAnalysis()
+  const [report, setReport] = useState<ReportData | null>(null)
 
   const generate = () => {
-    setGenerated(true)
-    message.success('报告已生成，可导出 Word / PPT')
+    const data = buildReport(profile, entries)
+    setReport(data)
+    localStorage.setItem('kq_last_report', data.title || DEFAULT_TITLE)
+    message.success('报告已基于知识库生成，可导出 Word / PPT')
   }
 
   return (
-    <div className="fade-up">
-      <div className="page-subtitle">一键生成竞品技术分析报告，导出 Word / PPT</div>
+    <RequireKnowledge>
+      <div className="fade-up">
+        <div className="page-subtitle">基于已建立的知识库动态生成竞品分析报告，导出 Word / PPT</div>
 
-      {!generated ? (
-        <div style={{ textAlign: 'center', paddingTop: 80 }}>
-          <Result
-            icon={<ThunderboltOutlined style={{ color: '#f5a623' }} />}
-            title="生成《EX2600-7E 竞品技术分析报告》"
-            subTitle="基于竞品技术档案，自动汇总六大章节内容"
-            extra={
-              <Button type="primary" size="large" onClick={generate}>
-                一键生成报告
+        {!report ? (
+          <div style={{ textAlign: 'center', paddingTop: 80 }}>
+            <Result
+              icon={<ThunderboltOutlined style={{ color: '#f5a623' }} />}
+              title="生成竞品技术分析报告"
+              subTitle={`系统根据已建立的知识库（${entries.length} 条技术切片）自动组装报告章节`}
+              extra={
+                <Button type="primary" size="large" onClick={generate}>
+                  一键生成报告
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          <>
+            <div style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Button type="primary" icon={<FileWordOutlined />} onClick={() => exportWord(report)}>
+                导出 Word
               </Button>
-            }
-          />
-        </div>
-      ) : (
-        <>
-          <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
-            <Button type="primary" icon={<FileWordOutlined />} onClick={() => exportWord()}>
-              导出 Word
-            </Button>
-            <Button icon={<FilePptOutlined />} onClick={() => exportPpt()} style={{ borderColor: '#f5a623', color: '#f5a623' }}>
-              导出 PPT
-            </Button>
-          </div>
+              <Button icon={<FilePptOutlined />} onClick={() => exportPpt(report)} style={{ borderColor: '#f5a623', color: '#f5a623' }}>
+                导出 PPT
+              </Button>
+              <span style={{ fontSize: 12, color: '#7a8ba3' }}>报告对象：{report.product} · 共 {report.sections.length} 章节</span>
+            </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {chapters.map((c) => (
-              <SectionCard key={c.title} title={c.title}>
-                <ul style={{ margin: 0, paddingLeft: 18, color: '#c9d4e3', lineHeight: 2 }}>
-                  {c.paras.map((p) => (
-                    <li key={p}>{p}</li>
-                  ))}
-                </ul>
-              </SectionCard>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {report.sections.map((c) => (
+                <SectionCard key={c.title} title={c.title}>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: '#c9d4e3', lineHeight: 2 }}>
+                    {c.paras.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ul>
+                </SectionCard>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </RequireKnowledge>
   )
 }

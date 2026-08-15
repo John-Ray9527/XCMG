@@ -1,58 +1,30 @@
 import { useState } from 'react'
-import { Button, Spin, message, Tag } from 'antd'
+import { Button, Spin, message, Tag, Empty } from 'antd'
 import { ThunderboltOutlined } from '@ant-design/icons'
-import ReactECharts from 'echarts-for-react'
 import SectionCard from '../components/SectionCard'
-import FlowDiagram from '../components/FlowDiagram'
-import { hitachiProfile } from '../data/mock'
+import RequireKnowledge from '../components/RequireKnowledge'
+import { useAnalysis } from '../store/AnalysisContext'
 import { analyzeHydraulic } from '../api/deepseek'
 
-const radarOption = {
-  tooltip: {},
-  radar: {
-    indicator: [
-      { name: '功率匹配', max: 100 },
-      { name: '负载控制', max: 100 },
-      { name: '节能', max: 100 },
-      { name: '可靠性', max: 100 },
-      { name: '维护性', max: 100 },
-    ],
-    axisName: { color: '#7a8ba3' },
-    splitLine: { lineStyle: { color: '#1e2836' } },
-    splitArea: { areaStyle: { color: ['#0d1422', '#111a2b'] } },
-  },
-  series: [
-    {
-      type: 'radar',
-      data: [
-        {
-          value: [90, 88, 82, 92, 85],
-          name: 'EX2600-7E',
-          areaStyle: { color: 'rgba(53,224,200,0.35)' },
-          lineStyle: { color: '#35e0c8', width: 2 },
-          itemStyle: { color: '#35e0c8' },
-        },
-      ],
-    },
-  ],
+function renderLines(text: string) {
+  return text
+    .split('\n')
+    .map((s) => s.replace(/^[-•*]\s*/, '').trim())
+    .filter(Boolean)
+    .map((s, i) => <li key={i}>{s}</li>)
 }
 
-const infoRows = (data: Record<string, string>) =>
-  Object.entries(data).map(([k, v]) => (
-    <div key={k} style={{ display: 'flex', gap: 8, padding: '6px 0' }}>
-      <span style={{ color: '#7a8ba3', width: 72, flexShrink: 0 }}>{k}</span>
-      <span style={{ color: '#c9d4e3' }}>{v}</span>
-    </div>
-  ))
-
 export default function HydraulicAnalysis() {
-  const [loading, setLoading] = useState(false)
+  const { profile, entries } = useAnalysis()
   const [evaluation, setEvaluation] = useState<{ advantages: string; improvements: string } | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const hydraulicEntries = entries.filter((e) => e.system === '液压系统')
 
   const run = async () => {
     setLoading(true)
     try {
-      setEvaluation(await analyzeHydraulic())
+      setEvaluation(await analyzeHydraulic(profile, entries))
     } catch (e) {
       message.error((e as Error).message)
     } finally {
@@ -60,80 +32,59 @@ export default function HydraulicAnalysis() {
     }
   }
 
-  const renderLines = (text: string) =>
-    text
-      .split('\n')
-      .map((s) => s.replace(/^[-•*]\s*/, '').trim())
-      .filter(Boolean)
-      .map((s, i) => <li key={i}>{s}</li>)
-
   return (
-    <div className="fade-up">
-      <div className="page-subtitle">分析 300 吨级液压挖掘机核心系统</div>
+    <RequireKnowledge>
+      <div className="fade-up">
+        <div className="page-subtitle">液压系统技术洞察 · 基于上传资料动态解析液压方案与控制策略</div>
 
-      <SectionCard title="液压系统拓扑图">
-        <FlowDiagram
-          nodes={[
-            { name: '发动机', icon: '🔥' },
-            { name: '液压泵', icon: '🔄' },
-            { name: '主控阀', icon: '🔀' },
-            { name: '油缸 / 马达', icon: '⚙' },
-          ]}
-        />
-      </SectionCard>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginTop: 16 }}>
-        <SectionCard title="泵系统">
-          {infoRows({
-            泵数量: hitachiProfile.hydraulic.pumpSystem.pumpCount,
-            泵类型: hitachiProfile.hydraulic.pumpSystem.pumpType,
-            流量特点: hitachiProfile.hydraulic.pumpSystem.flowFeature,
-          })}
-        </SectionCard>
-
-        <SectionCard title="控制策略">
-          {infoRows({
-            功率匹配: hitachiProfile.hydraulic.controlStrategy.powerMatch,
-            负载控制: hitachiProfile.hydraulic.controlStrategy.loadControl,
-            节能策略: hitachiProfile.hydraulic.controlStrategy.energySaving,
-          })}
-        </SectionCard>
-
-        <SectionCard title="系统能力雷达">
-          <ReactECharts option={radarOption} style={{ height: 200 }} />
-        </SectionCard>
-      </div>
-
-      <div style={{ marginTop: 16 }}>
-        <SectionCard
-          title="技术评价"
-          accent
-          extra={
-            <Button type="primary" icon={<ThunderboltOutlined />} onClick={run} loading={loading}>
-              AI 生成评价
-            </Button>
-          }
-        >
-          {!evaluation ? (
-            <div style={{ color: '#5b6a80', fontSize: 13 }}>
-              点击「AI 生成评价」，由大模型基于竞品手册生成液压系统优势与改进方向。
-            </div>
+        <SectionCard title="液压系统知识切片">
+          {hydraulicEntries.length === 0 ? (
+            <Empty description="上传资料中未解析到「液压系统」相关条目" />
           ) : (
-            <Spin spinning={loading}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div>
-                  <Tag color="success">优势</Tag>
-                  <ul style={{ color: '#c9d4e3', lineHeight: 2, paddingLeft: 18 }}>{renderLines(evaluation.advantages)}</ul>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {hydraulicEntries.map((e) => (
+                <div key={e.id} style={{ border: '1px solid #1e2836', borderRadius: 8, padding: '10px 14px', background: '#0d1422' }}>
+                  <div style={{ marginBottom: 6 }}>
+                    <Tag color="cyan">{e.source} P{e.page}</Tag>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#c9d4e3', lineHeight: 1.7 }}>{e.translation || e.original_text}</div>
                 </div>
-                <div>
-                  <Tag color="warning">可改进方向</Tag>
-                  <ul style={{ color: '#c9d4e3', lineHeight: 2, paddingLeft: 18 }}>{renderLines(evaluation.improvements)}</ul>
-                </div>
-              </div>
-            </Spin>
+              ))}
+            </div>
           )}
         </SectionCard>
+
+        <div style={{ marginTop: 16 }}>
+          <SectionCard
+            title="技术评价"
+            accent
+            extra={
+              <Button type="primary" icon={<ThunderboltOutlined />} onClick={run} loading={loading}>
+                AI 生成评价
+              </Button>
+            }
+          >
+            {!evaluation ? (
+              <div style={{ color: '#5b6a80', fontSize: 13 }}>
+                点击「AI 生成评价」，由大模型基于上传资料生成液压系统优势与改进方向。
+              </div>
+            ) : (
+              <Spin spinning={loading}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <Tag color="success">优势</Tag>
+                    <ul style={{ color: '#c9d4e3', lineHeight: 2, paddingLeft: 18 }}>{renderLines(evaluation.advantages)}</ul>
+                  </div>
+                  <div>
+                    <Tag color="warning">可改进方向</Tag>
+                    <ul style={{ color: '#c9d4e3', lineHeight: 2, paddingLeft: 18 }}>{renderLines(evaluation.improvements)}</ul>
+                  </div>
+                </div>
+              </Spin>
+            )}
+          </SectionCard>
+        </div>
       </div>
-    </div>
+    </RequireKnowledge>
   )
 }
